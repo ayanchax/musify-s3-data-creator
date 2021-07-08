@@ -1,7 +1,7 @@
 {
-    "name": "musify-s3-data-creator-node-endpoint",
+    "name": "musify-s3-data-node-endpoint",
     "version": "1.0.0",
-    "description": "AWS S3 Data Creator for Musify",
+    "description": "AWS S3 Data Manager Endpoint for Musify",
     "main": "server.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",

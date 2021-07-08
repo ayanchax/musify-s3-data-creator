@@ -78,6 +78,30 @@ router.get("/create/s3/media", (req, res, next) => {
         });
 });
 
+router.get("/s3/media", (req, res, next) => {
+    const aws = require("aws-sdk");
+    const fs = require("fs");
+    const dotenv = require("dotenv");
+    dotenv.config();
+    const s3 = new aws.S3({
+        accessKeyId: process.env.AWS_ID,
+        secretAccessKey: process.env.AWS_KEY,
+    });
+    const params = {
+        Bucket: process.env.AWS_S3_BUCKET_NAME,
+        Key: "musify-data/s3-musify-data-set.json",
+    };
+    //Fetch or read data from aws s3
+    s3.getObject(params, function(err, data) {
+        if (err) {
+            console.log(err);
+            res.status(500).json("Could not read media");
+        } else {
+            res.status(200).json(JSON.parse(data.Body.toString()));
+        }
+    });
+});
+
 function getAutoID() {
     return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) {
         var r = (Math.random() * 16) | 0,
@@ -103,6 +127,7 @@ function uploadMEDIAToAWS_S3(filenameWithPath, fname) {
         Bucket: process.env.AWS_S3_BUCKET_NAME,
         Key: process.env.AWS_S3_MUSIFY_MEDIA_FILE_PATH + "/" + fname,
         Body: fileContent,
+        ACL: "public-read",
     };
     return new Promise((resolve) => {
         // Uploading files to the bucket
@@ -143,6 +168,7 @@ function uploadJSONToAWS_S3(filenameWithPath) {
             "/" +
             process.env.AWS_S3_MUSIFY_JSON_FILE,
         Body: fileContent,
+        ACL: "public-read",
     };
     return new Promise((resolve) => {
         // Uploading files to the bucket
