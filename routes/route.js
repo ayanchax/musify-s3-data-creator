@@ -12,13 +12,16 @@ router.get("/create/s3/media", (req, res, next) => {
     const jsonDirectoryPath = path.join(__dirname, jsonPath);
     const dotenv = require("dotenv");
     dotenv.config();
-    var files = "";
+    var files = [];
     const promises = [];
     fs.readdirSync(directoryPath).forEach((file) => {
-        files += file + ",";
+        files.push(file);
     });
-    files = files.substring(0, files.length - 1).split(",");
 
+    if (files.length == 0) {
+        res.status(404).json("No media found to process");
+        return;
+    }
     for (i = 0; i < files.length; i++) {
         promises.push(getMetaData(directoryPath, files[i]));
     }
@@ -168,7 +171,7 @@ function getMetaData(path, fName) {
     dotenv.config();
     return new Promise((resolve) => {
         setTimeout(() => {
-            ffmpeg.ffprobe(path + "/" + fName, function(err, data) {
+            ffmpeg.ffprobe(fpath.join(path, fName), function(err, data) {
                 if (err) console.error("Error reading metadata", err);
                 else {
                     const s3Filename = fName.replace(/\s+/g, "+");
